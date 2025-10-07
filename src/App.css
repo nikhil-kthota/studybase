@@ -1,0 +1,201 @@
+/* CSS Custom Properties for Theme System */
+:root {
+  /* Light Theme Colors - Whitish with Blue */
+  --bg-primary: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  --bg-secondary: rgba(255, 255, 255, 0.8);
+  --text-primary: #000000;
+  --text-secondary: #374151;
+  --accent-color: #3b82f6;
+  --accent-glow: rgba(59, 130, 246, 0.2);
+  --card-bg: rgba(255, 255, 255, 0.25);
+  --card-border: rgba(59, 130, 246, 0.2);
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --navbar-bg: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] {
+  /* Dark Theme Colors */
+  --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  --bg-secondary: rgba(0, 0, 0, 0.3);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --accent-color: #00d4ff;
+  --accent-glow: rgba(0, 212, 255, 0.4);
+  --card-bg: rgba(0, 0, 0, 0.2);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --navbar-bg: rgba(18, 18, 18, 0.95);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Global paragraph alignment */
+p {
+  text-align: center;
+}
+
+/* Global text alignment rules - CENTER ALIGNED */
+h1, h2, h3, h4, h5, h6 {
+  text-align: center;
+}
+
+/* Ensure consistent center alignment for card content */
+.card-content h3,
+.card-content p,
+.main-card h3,
+.main-card p {
+  text-align: center;
+}
+
+/* Override justification for specific elements that should be center-aligned */
+.hero-title,
+.hero-subtitle,
+.main-card h3,
+.main-card p,
+.card-content h3,
+.card-content p {
+  text-align: center !important;
+}
+
+/* Global image and icon alignment */
+img, svg, .icon, .feature-icon, .card-icon, .floating-icon,
+.profile-avatar svg, .toggle-icon {
+  display: block;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Mobile-first responsive improvements */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+  
+  /* Responsive icon sizing */
+  .feature-icon,
+  .card-icon,
+  .floating-icon {
+    font-size: 1rem;
+  }
+  
+  .profile-avatar {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 13px;
+  }
+  
+  /* Smaller icons for mobile */
+  .feature-icon,
+  .card-icon,
+  .floating-icon {
+    font-size: 0.9rem;
+  }
+  
+  .profile-avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.app {
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Background Images */
+.app::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="0.3" fill="rgba(59,130,246,0.05)"/><circle cx="75" cy="75" r="0.2" fill="rgba(59,130,246,0.03)"/><circle cx="50" cy="10" r="0.25" fill="rgba(59,130,246,0.04)"/><circle cx="10" cy="60" r="0.15" fill="rgba(59,130,246,0.02)"/><circle cx="90" cy="40" r="0.2" fill="rgba(59,130,246,0.03)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.4;
+  z-index: -1;
+}
+
+[data-theme="dark"] .app::before {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="0.5" fill="rgba(255,255,255,0.05)"/><circle cx="75" cy="75" r="0.3" fill="rgba(255,255,255,0.03)"/><circle cx="50" cy="10" r="0.4" fill="rgba(255,255,255,0.04)"/><circle cx="10" cy="60" r="0.2" fill="rgba(255,255,255,0.02)"/><circle cx="90" cy="40" r="0.3" fill="rgba(255,255,255,0.02)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--accent-color), #ff6b6b, #4ecdc4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ff6b6b, var(--accent-color), #4ecdc4);
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
+  50% { box-shadow: 0 0 40px var(--accent-glow), 0 0 60px var(--accent-glow); }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Utility Classes */
+.gradient-text {
+  background: linear-gradient(45deg, var(--accent-color), #ff6b6b, #4ecdc4);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
