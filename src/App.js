@@ -1,21 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import MyAccount from './components/MyAccount';
+import NewBase from './components/NewBase';
+import MyBases from './components/MyBases';
+import BaseView from './components/BaseView';
+import EditBase from './components/EditBase';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
-function App() {
+function AppContent() {
   const [theme, setTheme] = useState('dark');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showSignup, setShowSignup] = useState(false);
+  const { isAuthenticated, signOut } = useAuth();
 
   useEffect(() => {
     // Load saved theme from localStorage, default to dark
     const savedTheme = localStorage.getItem('theme') || 'dark';
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
-    
-    // Check authentication status (will be replaced with actual backend check)
-    const savedAuthStatus = localStorage.getItem('isAuthenticated') === 'true';
-    setIsAuthenticated(savedAuthStatus);
   }, []);
 
   const toggleTheme = () => {
@@ -26,26 +33,35 @@ function App() {
   };
 
   const handleLogin = () => {
-    // Placeholder for login logic - will be replaced with actual backend integration
-    console.log('Login clicked');
-    // For testing purposes, you can uncomment the line below to simulate login
-    // setIsAuthenticated(true);
-    // localStorage.setItem('isAuthenticated', 'true');
+    setShowLogin(true);
   };
 
   const handleSignUp = () => {
-    // Placeholder for signup logic - will be replaced with actual backend integration
-    console.log('Sign Up clicked');
-    // For testing purposes, you can uncomment the line below to simulate signup
-    // setIsAuthenticated(true);
-    // localStorage.setItem('isAuthenticated', 'true');
+    setShowSignup(true);
   };
 
-  const handleLogout = () => {
-    // Placeholder for logout logic - will be replaced with actual backend integration
-    console.log('Logout clicked');
-    setIsAuthenticated(false);
-    localStorage.setItem('isAuthenticated', 'false');
+  const handleLogout = async () => {
+    const result = await signOut();
+    if (result.success) {
+      console.log('Successfully logged out');
+    } else {
+      console.error('Logout failed:', result.message);
+    }
+  };
+
+  const closeAuthModal = () => {
+    setShowLogin(false);
+    setShowSignup(false);
+  };
+
+  const switchToSignup = () => {
+    setShowLogin(false);
+    setShowSignup(true);
+  };
+
+  const switchToLogin = () => {
+    setShowSignup(false);
+    setShowLogin(true);
   };
 
   return (
@@ -58,8 +74,41 @@ function App() {
         onSignUp={handleSignUp}
         onLogout={handleLogout}
       />
-      <HeroSection />
+      
+      <Routes>
+        <Route path="/" element={<HeroSection />} />
+        <Route path="/my-account" element={<MyAccount />} />
+        <Route path="/new-base" element={<NewBase />} />
+        <Route path="/my-bases" element={<MyBases />} />
+        <Route path="/base/:baseId" element={<BaseView />} />
+        <Route path="/edit-base/:baseId" element={<EditBase />} />
+      </Routes>
+      
+      {/* Authentication Modals */}
+      {showLogin && (
+        <Login 
+          onSwitchToSignup={switchToSignup}
+          onClose={closeAuthModal}
+        />
+      )}
+      
+      {showSignup && (
+        <Signup 
+          onSwitchToLogin={switchToLogin}
+          onClose={closeAuthModal}
+        />
+      )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </Router>
   );
 }
 
