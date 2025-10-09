@@ -118,6 +118,11 @@ const MyAccount = () => {
 
   return (
     <div className="my-account">
+      <div className="my-account-background">
+        <div className="gradient-orb orb-1"></div>
+        <div className="gradient-orb orb-2"></div>
+        <div className="gradient-orb orb-3"></div>
+      </div>
       <div className="account-container">
         {/* Header */}
         <div className="account-header">

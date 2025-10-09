@@ -27,7 +27,7 @@ const Navbar = ({ theme, toggleTheme, isAuthenticated, onLogin, onSignUp, onLogo
     } else if (action === 'account') {
       navigate('/my-account');
     } else if (action === 'dashboard') {
-      navigate('/');
+      navigate('/dashboard');
     }
     setIsProfileDropdownOpen(false);
   };
@@ -49,7 +49,7 @@ const Navbar = ({ theme, toggleTheme, isAuthenticated, onLogin, onSignUp, onLogo
             <li><a href="#home" className="nav-link" onClick={() => navigate('/')}>Home</a></li>
             <li><a href="#new-base" className="nav-link" onClick={() => navigate('/new-base')}>New Base</a></li>
             <li><a href="#my-bases" className="nav-link" onClick={() => navigate('/my-bases')}>My Bases</a></li>
-            <li><a href="#chat" className="nav-link">Quiz</a></li>
+            <li><a href="#quiz" className="nav-link" onClick={() => navigate('/quiz')}>Quiz</a></li>
           </ul>
         </div>
 
@@ -165,7 +165,7 @@ const Navbar = ({ theme, toggleTheme, isAuthenticated, onLogin, onSignUp, onLogo
             <li><a href="#home" className="mobile-nav-link" onClick={() => { navigate('/'); toggleMobileMenu(); }}>Home</a></li>
             <li><a href="#new-base" className="mobile-nav-link" onClick={() => { navigate('/new-base'); toggleMobileMenu(); }}>New Base</a></li>
             <li><a href="#my-bases" className="mobile-nav-link" onClick={() => { navigate('/my-bases'); toggleMobileMenu(); }}>My Bases</a></li>
-            <li><a href="#chat" className="mobile-nav-link" onClick={toggleMobileMenu}>Chat</a></li>
+            <li><a href="#quiz" className="mobile-nav-link" onClick={() => { navigate('/quiz'); toggleMobileMenu(); }}>Quiz</a></li>
           </ul>
           
           {/* Mobile Authentication Section */}

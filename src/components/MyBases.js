@@ -113,6 +113,11 @@ const MyBases = () => {
 
   return (
     <div className="my-bases">
+      <div className="my-bases-background">
+        <div className="gradient-orb orb-1"></div>
+        <div className="gradient-orb orb-2"></div>
+        <div className="gradient-orb orb-3"></div>
+      </div>
       <div className="my-bases-container">
         {/* Header */}
         <div className="my-bases-header">

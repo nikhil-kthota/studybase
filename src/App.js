@@ -10,6 +10,10 @@ import NewBase from './components/NewBase';
 import MyBases from './components/MyBases';
 import BaseView from './components/BaseView';
 import EditBase from './components/EditBase';
+import Quiz from './components/Quiz';
+import QuizTaking from './components/QuizTaking';
+import QuizResults from './components/QuizResults';
+import Dashboard from './components/Dashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 function AppContent() {
@@ -77,11 +81,15 @@ function AppContent() {
       
       <Routes>
         <Route path="/" element={<HeroSection />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/my-account" element={<MyAccount />} />
         <Route path="/new-base" element={<NewBase />} />
         <Route path="/my-bases" element={<MyBases />} />
         <Route path="/base/:baseId" element={<BaseView />} />
         <Route path="/edit-base/:baseId" element={<EditBase />} />
+        <Route path="/quiz" element={<Quiz />} />
+        <Route path="/quiz/take/:quizId" element={<QuizTaking />} />
+        <Route path="/quiz/results/:quizId" element={<QuizResults />} />
       </Routes>
       
       {/* Authentication Modals */}

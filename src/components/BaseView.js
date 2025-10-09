@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { chatService } from '../services/chatService';
+import { chatPersistenceService } from '../services/chatPersistenceService';
 import './BaseView.css';
 
 const BaseView = () => {
@@ -23,6 +24,14 @@ const BaseView = () => {
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [isChatEnabled, setIsChatEnabled] = useState(false);
   const [chatError, setChatError] = useState('');
+  
+  // Chat management state
+  const [userChats, setUserChats] = useState([]);
+  const [activeChatId, setActiveChatId] = useState(null);
+  const [showChatList, setShowChatList] = useState(false);
+  const [newChatName, setNewChatName] = useState('');
+  const [showNewChatForm, setShowNewChatForm] = useState(false);
+  const [isLoadingChats, setIsLoadingChats] = useState(false);
 
   useEffect(() => {
     const loadBaseData = async () => {
@@ -32,6 +41,9 @@ const BaseView = () => {
       setError('');
       
       try {
+        // Initialize chat persistence service
+        chatPersistenceService.setCurrentUser(user.id);
+        
         // Load base information
         const { data: baseData, error: baseError } = await supabase
           .from('bases')
@@ -57,6 +69,9 @@ const BaseView = () => {
 
         if (filesError) throw filesError;
         setFiles(filesData || []);
+
+        // Load user chats for this base
+        await loadUserChats();
 
       } catch (err) {
         console.error('Error loading base data:', err);
@@ -171,6 +186,16 @@ const BaseView = () => {
     setIsChatLoading(true);
     setChatError('');
 
+    // Create new chat if none exists
+    if (!activeChatId) {
+      const chatName = selectedFile ? `Chat about ${selectedFile.file_name}` : 'New Chat';
+      const result = await chatPersistenceService.createChat(baseId, selectedFile?.id, chatName);
+      if (result.success) {
+        setActiveChatId(result.chatId);
+        await loadUserChats();
+      }
+    }
+
     // Add user message to chat
     const newUserMessage = {
       id: Date.now(),
@@ -179,6 +204,11 @@ const BaseView = () => {
       timestamp: new Date().toISOString()
     };
     setChatMessages(prev => [...prev, newUserMessage]);
+
+    // Save user message to database
+    if (activeChatId) {
+      await chatPersistenceService.saveMessage('user', userMessage);
+    }
 
     try {
       // Get AI response
@@ -192,6 +222,11 @@ const BaseView = () => {
           timestamp: new Date().toISOString()
         };
         setChatMessages(prev => [...prev, aiMessage]);
+
+        // Save AI message to database
+        if (activeChatId) {
+          await chatPersistenceService.saveMessage('ai', result.response);
+        }
       } else {
         const errorMessage = {
           id: Date.now() + 1,
@@ -200,6 +235,11 @@ const BaseView = () => {
           timestamp: new Date().toISOString()
         };
         setChatMessages(prev => [...prev, errorMessage]);
+
+        // Save error message to database
+        if (activeChatId) {
+          await chatPersistenceService.saveMessage('error', result.error || 'Sorry, I encountered an error processing your question.');
+        }
       }
     } catch (error) {
       console.error('Chat error:', error);
@@ -210,6 +250,11 @@ const BaseView = () => {
         timestamp: new Date().toISOString()
       };
       setChatMessages(prev => [...prev, errorMessage]);
+
+      // Save error message to database
+      if (activeChatId) {
+        await chatPersistenceService.saveMessage('error', 'Sorry, I encountered an error processing your question.');
+      }
     } finally {
       setIsChatLoading(false);
     }
@@ -218,6 +263,98 @@ const BaseView = () => {
   const clearChat = () => {
     setChatMessages([]);
     setChatError('');
+  };
+
+  // Chat management functions
+  const loadUserChats = async () => {
+    setIsLoadingChats(true);
+    try {
+      const result = await chatPersistenceService.getUserChats(baseId);
+      if (result.success) {
+        setUserChats(result.chats);
+      } else {
+        console.error('Error loading chats:', result.error);
+      }
+    } catch (error) {
+      console.error('Error loading chats:', error);
+    } finally {
+      setIsLoadingChats(false);
+    }
+  };
+
+  const createNewChat = async () => {
+    if (!newChatName.trim()) return;
+    
+    try {
+      const result = await chatPersistenceService.createChat(
+        baseId, 
+        selectedFile?.id, 
+        newChatName.trim()
+      );
+      
+      if (result.success) {
+        setActiveChatId(result.chatId);
+        setChatMessages([]);
+        setShowNewChatForm(false);
+        setNewChatName('');
+        await loadUserChats();
+      } else {
+        console.error('Error creating chat:', result.error);
+      }
+    } catch (error) {
+      console.error('Error creating chat:', error);
+    }
+  };
+
+  const loadChat = async (chatId) => {
+    try {
+      const result = await chatPersistenceService.getChatMessages(chatId);
+      if (result.success) {
+        setChatMessages(result.messages);
+        setActiveChatId(chatId);
+        chatPersistenceService.setCurrentChat(chatId);
+        setShowChatList(false);
+      } else {
+        console.error('Error loading chat:', result.error);
+      }
+    } catch (error) {
+      console.error('Error loading chat:', error);
+    }
+  };
+
+  const deleteChat = async (chatId) => {
+    if (!confirm('Are you sure you want to delete this chat? This action cannot be undone.')) {
+      return;
+    }
+    
+    try {
+      const result = await chatPersistenceService.deleteChat(chatId);
+      if (result.success) {
+        if (activeChatId === chatId) {
+          setActiveChatId(null);
+          setChatMessages([]);
+          chatPersistenceService.clearCurrentChat();
+        }
+        await loadUserChats();
+      } else {
+        console.error('Error deleting chat:', result.error);
+      }
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+    }
+  };
+
+  const renameChat = async (chatId, newName) => {
+    try {
+      const result = await chatPersistenceService.updateChatName(chatId, newName);
+      if (result.success) {
+        await loadUserChats();
+      } else {
+        console.error('Error renaming chat:', result.error);
+      }
+    } catch (error) {
+      console.error('Error renaming chat:', error);
+    }
   };
 
   const handleQuizClick = () => {
@@ -347,16 +484,149 @@ const BaseView = () => {
             {/* Chat Module */}
             <div className="chat-section">
               <div className="chat-header">
-                <h2 className="section-title">Chat</h2>
-                {chatMessages.length > 0 && (
-                  <button className="clear-chat-btn" onClick={clearChat} title="Clear chat">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path d="M3 6H5H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-                )}
+                <div className="chat-header-left">
+                  <h2 className="section-title">Chat</h2>
+                  <div className="chat-controls">
+                    <button 
+                      className="chat-list-btn" 
+                      onClick={() => setShowChatList(!showChatList)}
+                      title="Show chat list"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M8 6H21M8 12H21M8 18H21M3 6H3.01M3 12H3.01M3 18H3.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                    <button 
+                      className="new-chat-btn" 
+                      onClick={() => setShowNewChatForm(!showNewChatForm)}
+                      title="Create new chat"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                    {chatMessages.length > 0 && (
+                      <button className="clear-chat-btn" onClick={clearChat} title="Clear current chat">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path d="M3 6H5H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
+              
+              {/* Chat List Sidebar */}
+              {showChatList && (
+                <div className="chat-list-sidebar">
+                  <div className="chat-list-header">
+                    <h3>Your Chats</h3>
+                    <button 
+                      className="close-chat-list-btn" 
+                      onClick={() => setShowChatList(false)}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="chat-list">
+                    {isLoadingChats ? (
+                      <div className="chat-list-loading">
+                        <div className="loading-spinner-small"></div>
+                        <span>Loading chats...</span>
+                      </div>
+                    ) : userChats.length > 0 ? (
+                      userChats.map((chat) => (
+                        <div 
+                          key={chat.id} 
+                          className={`chat-list-item ${activeChatId === chat.id ? 'active' : ''}`}
+                          onClick={() => loadChat(chat.id)}
+                        >
+                          <div className="chat-item-info">
+                            <div className="chat-item-name">{chat.name}</div>
+                            <div className="chat-item-meta">
+                              {chat.messageCount} messages • {new Date(chat.updatedAt).toLocaleDateString()}
+                            </div>
+                            {chat.latestMessage && (
+                              <div className="chat-item-preview">
+                                {chat.latestMessage.content.substring(0, 50)}...
+                              </div>
+                            )}
+                          </div>
+                          <div className="chat-item-actions">
+                            <button 
+                              className="chat-item-delete-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteChat(chat.id);
+                              }}
+                              title="Delete chat"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                <path d="M3 6H5H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="no-chats">
+                        <div className="no-chats-icon">💬</div>
+                        <p>No chats yet</p>
+                        <p>Start a conversation to create your first chat!</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* New Chat Form */}
+              {showNewChatForm && (
+                <div className="new-chat-form">
+                  <div className="new-chat-form-header">
+                    <h3>Create New Chat</h3>
+                    <button 
+                      className="close-new-chat-btn" 
+                      onClick={() => setShowNewChatForm(false)}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="new-chat-form-content">
+                    <input
+                      type="text"
+                      placeholder="Enter chat name..."
+                      value={newChatName}
+                      onChange={(e) => setNewChatName(e.target.value)}
+                      className="new-chat-name-input"
+                      onKeyPress={(e) => e.key === 'Enter' && createNewChat()}
+                    />
+                    <div className="new-chat-form-actions">
+                      <button 
+                        className="create-chat-btn"
+                        onClick={createNewChat}
+                        disabled={!newChatName.trim()}
+                      >
+                        Create Chat
+                      </button>
+                      <button 
+                        className="cancel-chat-btn"
+                        onClick={() => {
+                          setShowNewChatForm(false);
+                          setNewChatName('');
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="chat-container">
                 <div className="chat-messages">
                   {chatMessages.length === 0 ? (
@@ -521,28 +791,6 @@ const BaseView = () => {
                   <p>Click on a file from the list to preview it here.</p>
                 </div>
               )}
-            </div>
-          </div>
-
-          {/* Study Options Section */}
-          <div className="options-section">
-            <h2 className="section-title">Study Options</h2>
-            <div className="options-grid">
-              <button className="option-btn quiz-btn" onClick={handleQuizClick}>
-                <div className="option-icon">🧠</div>
-                <div className="option-content">
-                  <h3>Quiz</h3>
-                  <p>Test your knowledge</p>
-                </div>
-              </button>
-
-              <button className="option-btn youtube-btn" onClick={handleYouTubeClick}>
-                <div className="option-icon">📺</div>
-                <div className="option-content">
-                  <h3>YouTube Suggestions</h3>
-                  <p>Related educational content</p>
-                </div>
-              </button>
             </div>
           </div>
         </div>

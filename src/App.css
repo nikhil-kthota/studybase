@@ -11,6 +11,8 @@
   --card-border: rgba(59, 130, 246, 0.2);
   --shadow-color: rgba(0, 0, 0, 0.1);
   --navbar-bg: rgba(255, 255, 255, 0.8);
+  --overlay-bg: rgba(255, 255, 255, 0.95);
+  --overlay-border: rgba(255, 255, 255, 0.2);
 }
 
 [data-theme="dark"] {
@@ -25,6 +27,8 @@
   --card-border: rgba(255, 255, 255, 0.1);
   --shadow-color: rgba(0, 0, 0, 0.3);
   --navbar-bg: rgba(18, 18, 18, 0.95);
+  --overlay-bg: rgba(0, 0, 0, 0.9);
+  --overlay-border: rgba(255, 255, 255, 0.1);
 }
 
 * {
