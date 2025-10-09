@@ -1,10 +1,10 @@
-# StudyBase - Futuristic Study Management Platform
+# StudyBase - AI-Powered Study Management Platform
 
-A modern, responsive React.js application with a futuristic design featuring dynamic authentication, light/dark theme support, and smooth animations.
+A comprehensive React.js application with Supabase backend integration, featuring dynamic authentication, PDF text extraction, AI-powered chat, and a futuristic glassmorphic design.
 
 ## 🚀 Project Overview
 
-StudyBase is a comprehensive study management platform designed to help students organize, collaborate, and enhance their learning experience. The platform features a sleek, futuristic interface with glassmorphic design elements, dynamic authentication states, and responsive mobile-first design.
+StudyBase is a complete study management platform that helps students organize their study materials, extract text from PDFs automatically, and interact with AI-powered chat to enhance their learning experience. The platform features a sleek, futuristic interface with glassmorphic design elements, real-time authentication, and intelligent PDF processing.
 
 ## ✨ Key Features
 
@@ -13,6 +13,7 @@ StudyBase is a comprehensive study management platform designed to help students
 - **Animated Gradients**: Dynamic color transitions and floating elements
 - **Smooth Animations**: Hover effects, transitions, and micro-interactions
 - **Custom SVG Patterns**: Subtle background textures for each theme
+- **Responsive Layout**: Mobile-first design with adaptive components
 
 ### 🌓 **Dynamic Theme System**
 - **Light Theme**: Clean white background with blue accents
@@ -21,10 +22,23 @@ StudyBase is a comprehensive study management platform designed to help students
 - **Persistent Settings**: Theme preference saved in localStorage
 
 ### 🔐 **Authentication System**
+- **Supabase Integration**: Real-time authentication with email/password
 - **Dynamic Navbar**: Changes based on user authentication status
-- **Desktop**: Shows Login/Sign Up buttons or Profile icon
-- **Mobile**: Profile icon with dropdown for authentication options
-- **Backend Ready**: Placeholder functions for easy API integration
+- **Protected Routes**: Secure access to user-specific content
+- **Session Management**: Persistent login sessions
+
+### 📚 **Study Base Management**
+- **Create Bases**: Organize study materials into themed collections
+- **File Upload**: Support for PDFs, images, and documents
+- **File Organization**: Sort files by upload date (latest first)
+- **Base Editing**: Add/remove files from existing bases
+- **Base Deletion**: Complete base removal with confirmation
+
+### 🤖 **AI-Powered Features**
+- **Automatic PDF Text Extraction**: Extract text from uploaded PDFs using PDF.js
+- **AI Chat Integration**: Ask questions about PDF content using Hugging Face API
+- **Context-Aware Responses**: AI responses based on extracted PDF text
+- **Multiple Model Fallback**: Automatic fallback to working AI models
 
 ### 📱 **Responsive Design**
 - **Mobile-First**: Optimized for all screen sizes
@@ -34,49 +48,95 @@ StudyBase is a comprehensive study management platform designed to help students
 
 ## 🛠️ Technology Stack
 
+### **Frontend**
 - **React 18**: Modern React with hooks and functional components
+- **React Router DOM**: Client-side routing and navigation
 - **CSS3**: Custom properties, animations, and modern layout techniques
+- **PDF.js**: PDF rendering and text extraction
 - **JavaScript ES6+**: Modern JavaScript features and syntax
-- **Responsive Design**: CSS Grid, Flexbox, and media queries
+
+### **Backend**
+- **Supabase**: Backend-as-a-Service for database, authentication, and storage
+- **PostgreSQL**: Relational database with Row Level Security (RLS)
+- **Supabase Storage**: File storage and management
+- **Hugging Face API**: AI model integration for chat functionality
+
+### **External APIs**
+- **Hugging Face Inference API**: Multiple AI models for text generation
+- **PDF.js CDN**: PDF processing and text extraction
 
 ## 📁 Project Structure
 
 ```
 studybase/
 ├── public/
-│   └── index.html                 # HTML template
+│   ├── index.html                 # HTML template
+│   └── pdf.worker.min.js          # PDF.js worker for text extraction
 ├── src/
 │   ├── components/
-│   │   ├── Navbar.js             # Dynamic navigation component
-│   │   ├── Navbar.css            # Navigation styling
-│   │   ├── HeroSection.js        # Main hero section
-│   │   └── HeroSection.css       # Hero section styling
-│   ├── App.js                    # Main application component
-│   ├── App.css                   # Global styles and theme variables
-│   ├── index.js                  # Application entry point
-│   └── index.css                 # Base styles
-├── package.json                  # Dependencies and scripts
-└── README.md                     # Project documentation
+│   │   ├── AuthContext.js         # Authentication context provider
+│   │   ├── BaseView.js            # Base viewing with PDF viewer and chat
+│   │   ├── BaseView.css           # Base view styling
+│   │   ├── EditBase.js            # Base editing component
+│   │   ├── EditBase.css           # Edit base styling
+│   │   ├── HeroSection.js         # Landing page hero section
+│   │   ├── HeroSection.css        # Hero section styling
+│   │   ├── Login.js               # Login form component
+│   │   ├── Login.css              # Login styling
+│   │   ├── MyAccount.js           # User account management
+│   │   ├── MyAccount.css          # Account styling
+│   │   ├── MyBases.js             # User's bases listing
+│   │   ├── MyBases.css            # My bases styling
+│   │   ├── Navbar.js              # Dynamic navigation component
+│   │   ├── Navbar.css             # Navigation styling
+│   │   ├── NewBase.js             # Create new base component
+│   │   ├── NewBase.css            # New base styling
+│   │   ├── PDFViewer.js           # PDF viewing component
+│   │   ├── PDFViewer.css          # PDF viewer styling
+│   │   ├── SignUp.js              # Sign up form component
+│   │   └── SignUp.css             # Sign up styling
+│   ├── lib/
+│   │   └── supabase.js            # Supabase client configuration
+│   ├── services/
+│   │   ├── chatService.js         # AI chat integration service
+│   │   └── pdfTextExtractor.js    # PDF text extraction service
+│   ├── App.js                     # Main application component
+│   ├── App.css                    # Global styles and theme variables
+│   ├── index.js                   # Application entry point
+│   └── index.css                  # Base styles
+├── supabase-queries.sql           # Database schema and RLS policies
+├── fix-pdf-text-content-rls.sql    # RLS policy fixes
+├── package.json                   # Dependencies and scripts
+├── .env.local                     # Environment variables (not tracked)
+├── env.template                   # Environment variables template
+└── README.md                      # Project documentation
 ```
 
 ## 🎯 Component Architecture
 
-### **App Component**
-- **State Management**: Theme and authentication state
-- **Event Handlers**: Theme toggle and authentication functions
-- **Local Storage**: Persistent theme and auth preferences
+### **Authentication System**
+- **AuthContext**: Global authentication state management
+- **Login/SignUp**: Form components with validation
+- **Protected Routes**: Secure access to user content
+- **Session Persistence**: Automatic login state restoration
 
-### **Navbar Component**
-- **Dynamic Rendering**: Different content based on auth status
-- **Mobile Support**: Hamburger menu and profile dropdown
-- **Theme Integration**: Responsive to theme changes
-- **Authentication**: Login/Sign Up buttons and profile management
+### **Base Management**
+- **MyBases**: List and manage user's study bases
+- **NewBase**: Create new bases with file upload
+- **EditBase**: Modify existing bases (add/remove files)
+- **BaseView**: View base contents with PDF viewer and chat
 
-### **HeroSection Component**
-- **Content Display**: Platform description and features
-- **Visual Elements**: Floating cards and animated icons
-- **Responsive Layout**: Adapts to different screen sizes
-- **Call-to-Action**: Encouraging user engagement
+### **File Management**
+- **File Upload**: Drag-and-drop file upload with progress
+- **File Types**: Support for PDFs, images, and documents
+- **File Sorting**: Automatic sorting by upload date
+- **File Deletion**: Remove files from bases
+
+### **AI Integration**
+- **PDF Text Extraction**: Automatic text extraction from PDFs
+- **Chat Service**: AI-powered Q&A about PDF content
+- **Model Fallback**: Multiple AI models for reliability
+- **Context Awareness**: Responses based on PDF content
 
 ## 🎨 Design System
 
@@ -117,25 +177,44 @@ studybase/
 ### Prerequisites
 - Node.js (version 14 or higher)
 - npm or yarn package manager
+- Supabase account
+- Hugging Face account (for AI features)
 
 ### Installation
-1. Clone or download the project files
-2. Navigate to the project directory:
+
+1. **Clone the repository:**
    ```bash
+   git clone <repository-url>
    cd studybase
    ```
 
-3. Install dependencies:
+2. **Install dependencies:**
    ```bash
    npm install
    ```
 
-4. Start the development server:
+3. **Set up environment variables:**
+   ```bash
+   cp env.template .env.local
+   ```
+   
+   Edit `.env.local` and add your API keys:
+   ```env
+   REACT_APP_SUPABASE_URL=your_supabase_url
+   REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
+   REACT_APP_HF_API_KEY=your_huggingface_api_key
+   ```
+
+4. **Set up Supabase database:**
+   - Run the SQL commands from `supabase-queries.sql` in your Supabase SQL editor
+   - Run the SQL commands from `fix-pdf-text-content-rls.sql` for RLS policies
+
+5. **Start the development server:**
    ```bash
    npm start
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) to view the application
+6. **Open [http://localhost:3000](http://localhost:3000) to view the application**
 
 ### Available Scripts
 - `npm start`: Runs the app in development mode
@@ -143,69 +222,116 @@ studybase/
 - `npm test`: Launches the test runner
 - `npm eject`: Ejects from Create React App (one-way operation)
 
-## 🔐 Authentication Integration
+## 🗄️ Database Schema
 
-The application is ready for backend integration with placeholder functions:
+### **Tables**
+- **users**: User profiles and authentication data
+- **bases**: Study base collections
+- **files**: Uploaded files metadata
+- **pdf_text_content**: Extracted PDF text for AI processing
 
-```javascript
-// In App.js - Replace these with actual API calls
-const handleLogin = () => {
-  // Your login logic here
-};
+### **Row Level Security (RLS)**
+- **User Isolation**: Users can only access their own data
+- **Secure File Access**: Files are protected by user ownership
+- **PDF Text Security**: Extracted text is user-specific
 
-const handleSignUp = () => {
-  // Your signup logic here
-};
+## 🤖 AI Features
 
-const handleLogout = () => {
-  // Your logout logic here
-};
-```
+### **PDF Text Extraction**
+- **Automatic Processing**: Text extraction happens during file upload
+- **PDF.js Integration**: Reliable PDF processing
+- **Fallback Methods**: Multiple extraction strategies
+- **Error Handling**: Graceful failure with user feedback
 
-### Testing Authentication
-To test the authentication flow, uncomment these lines in `App.js`:
-```javascript
-// setIsAuthenticated(true);
-// localStorage.setItem('isAuthenticated', 'true');
-```
+### **AI Chat**
+- **Context-Aware**: Responses based on PDF content
+- **Multiple Models**: Fallback system for reliability
+- **Real-time Processing**: Instant responses to user questions
+- **Error Recovery**: Graceful handling of API failures
 
-## 🎯 Significant Development Prompts
+## 🔐 Security Features
 
-This project was shaped by several key requirements and design decisions:
+- **Row Level Security**: Database-level access control
+- **Authentication**: Secure user sessions
+- **File Isolation**: Users can only access their own files
+- **API Key Protection**: Environment variable security
+- **Input Validation**: Form validation and sanitization
 
-### **1. Initial Project Setup**
-> "Create a React.js project styled with CSS (use JavaScript, not TypeScript).
-Build the main page with a navbar containing the links Home, New Base, My Bases, and Chat, centered in the navbar. On the left, display the project name StudyBase, and on the right, include a profile icon linking to the user account and a light/dark theme toggle switch."
+## 🚀 Key Features Implemented
 
-### **2. Theme Design Requirements**
-> "Use the two provided images as the light and dark mode themes, respectively. Design the webpage in a unique, futuristic style."
+### **✅ Completed Features**
+- [x] User authentication (login/signup)
+- [x] Study base creation and management
+- [x] File upload and organization
+- [x] PDF text extraction
+- [x] AI-powered chat with PDF context
+- [x] Responsive design
+- [x] Theme switching
+- [x] Database integration
+- [x] File management (add/remove)
+- [x] Base editing and deletion
 
-### **3. Light Theme Refinement**
-> "Update the light mode to be more white-dominant with blue as the secondary color. Fix the navbar layout and redesign the Hero Visual section for better presentation."
+### **🔄 Current Status**
+- **Authentication**: Fully functional with Supabase
+- **File Management**: Complete CRUD operations
+- **PDF Processing**: Automatic text extraction
+- **AI Chat**: Multi-model fallback system
+- **UI/UX**: Responsive glassmorphic design
 
-### **4. Responsive Design**
-> "Make the whole website responsive, handle the navbar in mobile view."
+## 🎯 Development History
 
-### **5. Content and Styling Updates**
-> "Apply glassmorphism to cards in light theme.
-Ensure all paragraphs are justified throughout the project, including future edits. Add the following line below the main card and floating elements: “Start by creating your first Base and see how simple and satisfying studying can be when everything you need is right in front of you.” Set the dark theme as the default."
+This project evolved through several key phases:
 
-### **6. Text Visibility Enhancement**
-> "Make the para text in light theme black to increase visibility."
+### **Phase 1: Foundation**
+- Initial React setup with futuristic design
+- Theme system implementation
+- Responsive navigation
 
-### **7. Authentication System**
-> "According to the user status(whether the user is logged in or not, the navbar should change). If logged in it should show the profile icon. If not logged in there should be two buttons, to the right of the theme toggle: 'Log In' and 'Sign Up'. The backend logic, user authentication logics will be provided later, just create it and it will be tested after backend integration."
+### **Phase 2: Authentication**
+- Supabase integration
+- User authentication system
+- Protected routes
 
-### **8. Mobile Authentication Enhancement**
-> "In mobile view, between the toggle and hamburger icon, there should be a profile icon and when hovered or clicked on it, the signup and login buttons must appear. THIS IS ONLY FOR Mobile view or wherever the Hamburger menu is used."
+### **Phase 3: Base Management**
+- Study base CRUD operations
+- File upload system
+- Base editing capabilities
+
+### **Phase 4: AI Integration**
+- PDF text extraction
+- AI chat implementation
+- Multi-model fallback system
 
 ## 🚀 Future Enhancements
 
-- **Backend Integration**: Connect authentication with actual API
-- **Routing**: Implement React Router for navigation
-- **User Dashboard**: Create user-specific pages
-- **Study Base Management**: Implement CRUD operations
-- **Real-time Chat**: Add WebSocket integration
-- **File Upload**: Support for study materials
-- **Progress Tracking**: Analytics and progress visualization
-- **Collaboration Features**: Multi-user study sessions
+- **Real-time Collaboration**: Multi-user study sessions
+- **Advanced AI Features**: Document summarization, question generation
+- **Progress Tracking**: Study analytics and progress visualization
+- **Mobile App**: React Native version
+- **Offline Support**: PWA capabilities
+- **Advanced File Types**: Support for more document formats
+- **Study Groups**: Collaborative study features
+- **Export Features**: PDF generation and sharing
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📞 Support
+
+For support and questions:
+- Create an issue in the repository
+- Check the documentation
+- Review the code comments
+
+---
+
+**StudyBase** - Making studying simple, organized, and AI-powered! 🚀📚🤖
