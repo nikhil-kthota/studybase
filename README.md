@@ -13,7 +13,6 @@ This project was developed as an assignment to build a fully functional, respons
 - **PDF Selection**: Implemented comprehensive file/base selection system in Quiz component
 - **Upload Functionality**: Users can upload their own PDF coursebooks through NewBase and EditBase components
 - **File Management**: Complete CRUD operations for PDFs with automatic text extraction
-- **Testing Ready**: System ready for NCERT Class XI Physics PDFs (can be uploaded via the interface)
 
 ### 2. PDF Viewer ✅ **FULLY IMPLEMENTED**
 - **Split View**: PDF viewer displays alongside chat in a 50/50 split layout
@@ -140,45 +139,6 @@ This project was developed as an assignment to build a fully functional, respons
    ```bash
    npm start
    ```
-
-## 📊 Assignment Evaluation Criteria
-
-### 1. Scope Coverage (50%) - **85% Complete**
-- ✅ Source Selector: 100% implemented
-- ✅ PDF Viewer: 100% implemented  
-- ✅ Quiz Generator Engine: 100% implemented
-- ✅ Progress Tracking: 100% implemented
-- ❌ RAG Citations: 0% implemented
-- ❌ YouTube Recommender: 0% implemented
-
-### 2. UI/UX (20%) - **95% Complete**
-- ✅ Glassmorphic design with modern aesthetics
-- ✅ Intuitive navigation and user flow
-- ✅ Consistent theme and branding
-- ✅ Smooth animations and transitions
-- ✅ User-friendly interface design
-
-### 3. Responsiveness (10%) - **100% Complete**
-- ✅ Mobile-first responsive design
-- ✅ Tablet and desktop optimization
-- ✅ Flexible layouts and components
-- ✅ Touch-friendly interface elements
-
-### 4. Code Quality (10%) - **90% Complete**
-- ✅ Modular component architecture
-- ✅ Clean, readable code structure
-- ✅ Proper error handling
-- ✅ Optimized CSS and performance
-- ✅ Comprehensive documentation
-
-### 5. README (10%) - **100% Complete**
-- ✅ Comprehensive setup instructions
-- ✅ Feature documentation
-- ✅ Technical implementation details
-- ✅ AI tools usage explanation
-
-## 🎯 What's Done vs What's Missing
-
 ### ✅ **Successfully Implemented**
 - Complete base and file management system
 - PDF viewer with split-screen chat interface
@@ -219,7 +179,7 @@ The application is ready for testing with the following features:
 - Quiz generation and taking
 - Progress tracking and analytics
 - Responsive design across all devices
-
+Live Demo at : https://studybase-mu.vercel.app/
 ## 📈 Future Enhancements
 
 ### **Immediate Improvements**
@@ -249,5 +209,3 @@ This project was developed using a combination of traditional development practi
 For questions about this implementation or to discuss the development process, please refer to the code comments and documentation within the project.
 
 ---
-
-**StudyBase** - A comprehensive study management platform built with AI assistance, delivering core functionality while maintaining high code quality and user experience standards. 🎓✨
