@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { pdfTextExtractor } from '../services/pdfTextExtractor';
 import './NewBase.css';
 
 const NewBase = () => {
@@ -148,14 +149,33 @@ const NewBase = () => {
 
       // Save file records to database
       if (uploadedFiles.length > 0) {
-        const { error: filesError } = await supabase
+        const { data: insertedFiles, error: filesError } = await supabase
           .from('base_files')
-          .insert(uploadedFiles);
+          .insert(uploadedFiles)
+          .select();
 
         if (filesError) throw filesError;
+
+        // Automatically extract text from PDF files
+        const pdfFiles = insertedFiles.filter(file => file.file_type === 'application/pdf');
+        if (pdfFiles.length > 0) {
+          console.log(`Starting automatic text extraction for ${pdfFiles.length} PDF file(s)...`);
+          
+          // Extract text from each PDF file asynchronously (don't wait for completion)
+          pdfFiles.forEach(async (file) => {
+            try {
+              console.log(`Extracting text from PDF: ${file.file_name}`);
+              await pdfTextExtractor.extractAndStoreText(file.id, file.file_path, file.file_name);
+              console.log(`Successfully extracted text from: ${file.file_name}`);
+            } catch (extractionError) {
+              console.error(`Failed to extract text from ${file.file_name}:`, extractionError);
+              // Don't throw error - extraction failure shouldn't prevent base creation
+            }
+          });
+        }
       }
 
-      setSuccess(`Base "${baseName}" created successfully with ${uploadedFiles.length} files!`);
+      setSuccess(`Base "${baseName}" created successfully with ${uploadedFiles.length} files!${uploadedFiles.filter(f => f.file_type === 'application/pdf').length > 0 ? ' PDF text extraction started automatically.' : ''}`);
       
       // Redirect to the base view after a short delay
       setTimeout(() => {

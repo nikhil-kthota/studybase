@@ -16,6 +16,7 @@ const MyAccount = () => {
   const [userFiles, setUserFiles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -66,6 +67,8 @@ const MyAccount = () => {
 
     loadUserData();
   }, [user]);
+
+
 
   const handleLogout = async () => {
     const result = await signOut();
@@ -199,6 +202,7 @@ const MyAccount = () => {
             )}
           </div>
         </div>
+
 
         {/* My Bases Section */}
         <div className="bases-section">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { pdfTextExtractor } from '../services/pdfTextExtractor';
 import './EditBase.css';
 
 const EditBase = () => {
@@ -179,21 +180,40 @@ const EditBase = () => {
 
       // Save new file records to database
       if (uploadedFiles.length > 0) {
-        const { error: filesError } = await supabase
+        const { data: insertedFiles, error: filesError } = await supabase
           .from('base_files')
-          .insert(uploadedFiles);
+          .insert(uploadedFiles)
+          .select();
 
         if (filesError) throw filesError;
 
         // Update local state - sort by upload date to maintain chronological order
         setFiles(prev => {
-          const allFiles = [...uploadedFiles, ...prev];
+          const allFiles = [...insertedFiles, ...prev];
           return allFiles.sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
         });
         setNewFiles([]);
+
+        // Automatically extract text from PDF files
+        const pdfFiles = insertedFiles.filter(file => file.file_type === 'application/pdf');
+        if (pdfFiles.length > 0) {
+          console.log(`Starting automatic text extraction for ${pdfFiles.length} PDF file(s)...`);
+          
+          // Extract text from each PDF file asynchronously (don't wait for completion)
+          pdfFiles.forEach(async (file) => {
+            try {
+              console.log(`Extracting text from PDF: ${file.file_name}`);
+              await pdfTextExtractor.extractAndStoreText(file.id, file.file_path, file.file_name);
+              console.log(`Successfully extracted text from: ${file.file_name}`);
+            } catch (extractionError) {
+              console.error(`Failed to extract text from ${file.file_name}:`, extractionError);
+              // Don't throw error - extraction failure shouldn't prevent file upload
+            }
+          });
+        }
       }
 
-      setSuccess(`Base updated successfully! ${uploadedFiles.length} new files added.`);
+      setSuccess(`Base updated successfully! ${uploadedFiles.length} new files added.${uploadedFiles.filter(f => f.file_type === 'application/pdf').length > 0 ? ' PDF text extraction started automatically.' : ''}`);
       
       // Redirect back to base view after a short delay
       setTimeout(() => {
