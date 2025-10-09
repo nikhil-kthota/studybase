@@ -1,3 +1,4 @@
+Check out the live demo at https://studybase-mu.vercel.app/
 # StudyBase 📚
 
 A comprehensive study management platform built for school students to revise from their coursebooks using AI-powered features.
