@@ -1,100 +1,96 @@
 # StudyBase 📚
 
-A comprehensive study management platform built for school students to revise from their coursebooks using AI-powered features.
+A comprehensive study management platform built with React.js and Supabase.
 
-## 🎯 Assignment Overview
+This project was started off as an assignment to build a fully functional, responsive web app that helps school students revise from their coursebooks.
 
-This project was developed as an assignment to build a fully functional, responsive web app that helps school students revise from their coursebooks using LLMs aggressively to move fast while ensuring a good representation of development skills.
+## 🌟 Features
 
-## ✅ Must-Have Features Implementation Status
+### Core Functionality
+- **Base Management**: Create, organize, and manage study bases
+- **File Management**: Upload, view, and organize PDFs and images
+- **AI Chat Assistant**: Interactive chat with PDF content using Hugging Face LLM
+- **Quiz Generation**: Automated quiz creation from PDF content
+- **Dashboard Analytics**: Track quiz performance and study progress
 
-### 1. Source Selector ✅ **FULLY IMPLEMENTED**
-- **PDF Selection**: Implemented comprehensive file/base selection system in Quiz component
-- **Upload Functionality**: Users can upload their own PDF coursebooks through NewBase and EditBase components
-- **File Management**: Complete CRUD operations for PDFs with automatic text extraction
-- **Testing Ready**: System ready for NCERT Class XI Physics PDFs (can be uploaded via the interface)
+### Advanced Features
+- **PDF Text Extraction**: Automatic text extraction and storage
+- **Multi-Chat Sessions**: Create and manage multiple chat conversations per base
+- **Quiz Types**: Multiple Choice Questions (MCQs), Short Answer Questions (SAQs), and Long Answer Questions (LAQs)
+- **Intelligent Evaluation**: AI-powered answer evaluation with similarity scoring
+- **Responsive Design**: Glassmorphic UI with dark/light theme support
 
-### 2. PDF Viewer ✅ **FULLY IMPLEMENTED**
-- **Split View**: PDF viewer displays alongside chat in a 50/50 split layout
-- **PDF Rendering**: Full PDF.js integration with zoom, navigation, and page controls
-- **File Selection**: Users can select different PDFs from their bases
-- **Responsive Design**: Optimized for both desktop and mobile viewing
-
-### 3. Quiz Generator Engine ✅ **FULLY IMPLEMENTED**
-- **Question Types**: Complete implementation of MCQs, SAQs, and LAQs
-- **AI Generation**: Uses Hugging Face LLM to generate questions from PDF content
-- **Quiz Taking**: Interactive quiz interface with proper answer capture
-- **Scoring System**: Automated scoring with explanations
-- **Storage**: All quiz attempts stored in database with detailed analytics
-- **New Questions**: Option to generate new sets of questions with different configurations
-
-### 4. Progress Tracking ✅ **FULLY IMPLEMENTED**
-- **Dashboard**: Comprehensive analytics dashboard showing quiz performance
-- **Strengths/Weaknesses**: Detailed breakdown of performance by question type
-- **Learning Journey**: Track quiz history, scores, and improvement over time
-- **Statistics**: Total quizzes, questions attempted, average percentage, and performance graphs
-
-## 🌟 Nice-to-Have Features Implementation Status
-
-### 1. Chat UI (ChatGPT-inspired) ✅ **FULLY IMPLEMENTED**
-- **Left Drawer**: Chat list sidebar with all user conversations
-- **Main Chat Window**: Clean, responsive chat interface
-- **Input Box**: Bottom-positioned input with send functionality
-- **New Chat**: Create new chat sessions per base
-- **Switch Chat**: Seamlessly switch between different chat conversations
-- **Mobile Responsive**: Fully optimized for mobile devices
-- **Clean Design**: Glassmorphic UI with modern aesthetics
-
-### 2. RAG Answers with Citations ❌ **NOT IMPLEMENTED**
-- **Status**: This feature was not implemented due to time constraints
-- **Reason**: Focus was placed on core functionality and chat system
-- **Alternative**: Chat system uses extracted PDF text as context for responses
-
-### 3. YouTube Videos Recommender ❌ **NOT IMPLEMENTED**
-- **Status**: This feature was not implemented due to time constraints
-- **Reason**: Priority was given to core quiz and chat functionality
-- **Future Enhancement**: Could be added as a future feature
-
-## 🛠️ Technical Implementation
+## 🏗️ Architecture
 
 ### Frontend Stack
 - **React.js 18**: Modern React with hooks and functional components
 - **React Router DOM**: Client-side routing and navigation
-- **CSS3**: Custom glassmorphic design with animations
+- **CSS3**: Custom styling with glassmorphic design and animations
 - **PDF.js**: PDF rendering and text extraction
 
 ### Backend Stack
 - **Supabase**: Backend-as-a-Service for database, authentication, and storage
 - **PostgreSQL**: Relational database with Row Level Security (RLS)
 - **Supabase Storage**: File storage and management
+- **Hugging Face API**: Large Language Model integration
 
 ### AI Integration
-- **Hugging Face API**: Large Language Model integration
 - **Model**: `meta-llama/Llama-3.1-8B-Instruct:fireworks-ai`
-- **Features**: Chat completions, quiz generation, answer evaluation
+- **Model API**: Hugging Face Router API
+- **Features**: Chat completions, text similarity evaluation, quiz generation
 
-## 🤖 AI Tools Leveraged
+## 📁 Project Structure
 
-### Primary AI Assistant: **Cursor AI**
-- **Code Generation**: Used extensively for rapid component development
-- **Bug Fixing**: Leveraged for debugging and error resolution
-- **Architecture Decisions**: AI-assisted in making technical decisions
-- **Code Optimization**: Used for CSS optimization and performance improvements
-- **Database Schema**: AI-generated database schemas and RLS policies
+```
+src/
+├── components/
+│   ├── AuthForm.css          # Authentication form styling
+│   ├── BaseView.js/.css      # Base viewing and file management
+│   ├── Dashboard.js/.css     # Analytics and performance tracking
+│   ├── EditBase.js/.css      # Base editing functionality
+│   ├── HeroSection.js/.css   # Landing page hero section
+│   ├── Login.js             # User login component
+│   ├── MyAccount.js/.css     # User account management
+│   ├── MyBases.js/.css       # Base listing and management
+│   ├── Navbar.js/.css        # Navigation component
+│   ├── NewBase.js/.css       # Base creation
+│   ├── Quiz.js/.css          # Quiz configuration
+│   ├── QuizResults.js/.css   # Quiz results display
+│   ├── QuizTaking.js/.css    # Quiz taking interface
+│   └── Signup.js            # User registration component
+├── services/
+│   ├── chatService.js        # Hugging Face API integration
+│   ├── chatPersistenceService.js # Chat data management
+│   ├── pdfTextExtractor.js   # PDF text extraction
+│   ├── quizEvaluationService.js # Quiz answer evaluation
+│   ├── quizGenerationService.js # Quiz question generation
+│   └── quizPersistenceService.js # Quiz data management
+├── App.js                    # Main application component
+├── App.css                   # Global styles and theme variables
+└── index.js                  # Application entry point
+```
 
-### Secondary AI Tools: **ChatGPT**
-- **Planning**: Used for project planning and feature breakdown
-- **Documentation**: Assisted in creating comprehensive documentation
-- **Problem Solving**: Used for complex technical problem resolution
-- **Code Review**: AI-assisted code review and optimization suggestions
+## 🗄️ Database Schema
 
-### Development Process with AI
-1. **Initial Planning**: Used ChatGPT to break down assignment requirements
-2. **Rapid Prototyping**: Cursor AI for quick component creation
-3. **Feature Implementation**: AI-assisted development of core features
-4. **Bug Resolution**: Leveraged AI for debugging complex issues
-5. **Optimization**: AI-powered code optimization and cleanup
-6. **Documentation**: AI-assisted documentation creation
+### Core Tables
+- **bases**: Study base information
+- **base_files**: File metadata and storage references
+- **pdf_text_content**: Extracted PDF text with processing status
+
+### Chat System
+- **chats**: Chat session management
+- **chat_messages**: Individual chat messages
+
+### Quiz System
+- **quizzes**: Quiz configuration and metadata
+- **quiz_sources**: Source files/bases for quiz generation
+- **quiz_questions**: Individual quiz questions
+- **quiz_answers**: User answers and evaluation results
+
+### Security
+- **Row Level Security (RLS)**: User-specific data access
+- **RLS Policies**: Secure data isolation per user
+- **Storage Policies**: File access control
 
 ## 🚀 Setup Instructions
 
@@ -140,113 +136,150 @@ This project was developed as an assignment to build a fully functional, respons
    npm start
    ```
 
-## 📊 Assignment Evaluation Criteria
+## 🔧 Configuration
 
-### 1. Scope Coverage (50%) - **85% Complete**
-- ✅ Source Selector: 100% implemented
-- ✅ PDF Viewer: 100% implemented  
-- ✅ Quiz Generator Engine: 100% implemented
-- ✅ Progress Tracking: 100% implemented
-- ❌ RAG Citations: 0% implemented
-- ❌ YouTube Recommender: 0% implemented
+### Supabase Setup
+1. Create a new Supabase project
+2. Enable Row Level Security
+3. Run the database schema scripts
+4. Configure storage buckets for file uploads
+5. Set up RLS policies for data security
 
-### 2. UI/UX (20%) - **95% Complete**
-- ✅ Glassmorphic design with modern aesthetics
-- ✅ Intuitive navigation and user flow
-- ✅ Consistent theme and branding
-- ✅ Smooth animations and transitions
-- ✅ User-friendly interface design
+### Hugging Face API
+1. Get API key from Hugging Face
+2. Add to environment variables
+3. Ensure sufficient API credits for usage
 
-### 3. Responsiveness (10%) - **100% Complete**
-- ✅ Mobile-first responsive design
-- ✅ Tablet and desktop optimization
-- ✅ Flexible layouts and components
-- ✅ Touch-friendly interface elements
+## 📱 User Interface
 
-### 4. Code Quality (10%) - **90% Complete**
-- ✅ Modular component architecture
-- ✅ Clean, readable code structure
-- ✅ Proper error handling
-- ✅ Optimized CSS and performance
-- ✅ Comprehensive documentation
+### Design System
+- **Theme**: Glassmorphic design with blue accent colors
+- **Responsive**: Mobile-first approach with breakpoints
+- **Animations**: Smooth transitions and hover effects
+- **Accessibility**: Keyboard navigation and screen reader support
 
-### 5. README (10%) - **100% Complete**
-- ✅ Comprehensive setup instructions
-- ✅ Feature documentation
-- ✅ Technical implementation details
-- ✅ AI tools usage explanation
+### Key Components
+- **Navigation**: Fixed navbar with theme toggle and user menu
+- **File Viewer**: PDF rendering with zoom and navigation
+- **Chat Interface**: Split-screen chat and file viewer
+- **Quiz Interface**: Interactive question answering
+- **Dashboard**: Performance analytics and statistics
 
-## 🎯 What's Done vs What's Missing
+## 🤖 AI Features
 
-### ✅ **Successfully Implemented**
-- Complete base and file management system
-- PDF viewer with split-screen chat interface
-- AI-powered quiz generation (MCQs, SAQs, LAQs)
-- Comprehensive progress tracking and analytics
-- Multi-session chat system with persistence
-- Responsive glassmorphic UI design
-- User authentication and data security
-- Automated PDF text extraction
-- Quiz scoring and evaluation system
+### Chat Assistant
+- **Context-Aware**: Uses extracted PDF text as context
+- **Multi-Session**: Create multiple chat sessions per base
+- **Persistent**: Chat history saved and retrievable
+- **Real-Time**: Streaming responses from LLM
 
-### ❌ **Not Implemented (Due to Time Constraints)**
-- RAG answers with page citations
-- YouTube video recommendations
-- Advanced PDF chunking and embedding
-- Citation system for chat responses
+### Quiz Generation
+- **Content-Based**: Questions generated from PDF content
+- **Configurable**: Customizable difficulty and question counts
+- **Multiple Types**: MCQs, SAQs, and LAQs
+- **Intelligent Parsing**: Structured question format extraction
 
-## 🔧 Development Decisions & Tradeoffs
+### Answer Evaluation
+- **MCQ**: Direct option matching
+- **SAQ**: 90% similarity threshold using LLM
+- **LAQ**: 75% similarity threshold using LLM
+- **Automated Scoring**: Marks calculated and stored
 
-### **Priority Decisions**
-1. **Core Functionality First**: Focused on implementing all must-have features
-2. **AI Integration**: Prioritized working AI chat and quiz generation
-3. **User Experience**: Invested heavily in responsive design and smooth UX
-4. **Data Persistence**: Implemented comprehensive data storage and retrieval
+## 🔒 Security Features
 
-### **Technical Tradeoffs**
-1. **Simple Text Extraction**: Used basic PDF text extraction instead of complex chunking
-2. **Direct LLM Integration**: Used Hugging Face API directly instead of building RAG pipeline
-3. **Focus on Core Features**: Prioritized quiz and chat over advanced features
-4. **Rapid Development**: Used AI tools extensively for faster development
+### Authentication
+- **Supabase Auth**: Email/password authentication
+- **Session Management**: Secure session handling
+- **User Isolation**: Data access restricted per user
 
-## 🚀 Live Demo
+### Data Protection
+- **RLS Policies**: Database-level security
+- **File Access Control**: Storage bucket policies
+- **API Key Security**: Environment variable protection
 
-The application is ready for testing with the following features:
-- User registration and authentication
-- PDF upload and management
-- Interactive chat with AI assistant
-- Quiz generation and taking
-- Progress tracking and analytics
-- Responsive design across all devices
+## 📊 Performance Features
+
+### Optimization
+- **Code Splitting**: Lazy loading of components
+- **CSS Optimization**: Removed unused styles
+- **Image Optimization**: Efficient file handling
+- **Caching**: Supabase query optimization
+
+### Analytics
+- **Quiz Performance**: Score tracking and trends
+- **Usage Statistics**: File uploads and chat sessions
+- **Progress Tracking**: Study base management metrics
+
+## 🛠️ Development
+
+### Code Quality
+- **ESLint**: Code linting and formatting
+- **Component Structure**: Modular and reusable components
+- **Service Layer**: Separated business logic
+- **Error Handling**: Comprehensive error management
+
+### Testing
+- **Component Testing**: React component testing
+- **Service Testing**: API integration testing
+- **E2E Testing**: User workflow testing
+
+## 🚀 Deployment
+
+### Production Build
+```bash
+npm run build
+```
+
+### Environment Variables
+Ensure all production environment variables are set:
+- Supabase URL and keys
+- Hugging Face API key
+- Any additional configuration
+
+### Hosting Options
+- **Vercel**: Recommended for React apps
+- **Netlify**: Alternative hosting platform
+- **AWS S3**: Static site hosting
+- **Custom Server**: Node.js deployment
 
 ## 📈 Future Enhancements
 
-### **Immediate Improvements**
-- Implement RAG with citations
-- Add YouTube video recommendations
-- Enhanced PDF chunking and embedding
-- Advanced analytics and insights
+### Planned Features
+- **Collaborative Bases**: Multi-user study bases
+- **Advanced Analytics**: Detailed performance insights
+- **Mobile App**: React Native implementation
+- **Offline Support**: PWA capabilities
+- **AI Improvements**: Better context understanding
 
-### **Long-term Features**
-- Collaborative study bases
-- Mobile app development
-- Offline support
-- Advanced AI features
+### Technical Improvements
+- **Performance**: Further optimization
+- **Accessibility**: Enhanced screen reader support
+- **Internationalization**: Multi-language support
+- **Testing**: Comprehensive test coverage
 
-## 🤝 Development Journey
+## 🤝 Contributing
 
-This project was developed using a combination of traditional development practices and aggressive use of AI tools:
+### Development Guidelines
+1. Follow React best practices
+2. Maintain consistent code style
+3. Write comprehensive comments
+4. Test all new features
+5. Update documentation
 
-1. **Planning Phase**: Used ChatGPT to understand requirements and plan architecture
-2. **Rapid Development**: Leveraged Cursor AI for quick component creation
-3. **Feature Implementation**: AI-assisted development of complex features
-4. **Testing & Debugging**: Used AI tools for bug resolution and optimization
-5. **Documentation**: AI-assisted creation of comprehensive documentation
+### Pull Request Process
+1. Fork the repository
+2. Create feature branch
+3. Implement changes
+4. Test thoroughly
+5. Submit pull request
 
-## 📞 Contact
+## 📄 License
 
-For questions about this implementation or to discuss the development process, please refer to the code comments and documentation within the project.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
----
+## 🙏 Acknowledgments
 
-**StudyBase** - A comprehensive study management platform built with AI assistance, delivering core functionality while maintaining high code quality and user experience standards. 🎓✨
+- **Supabase**: Backend infrastructure
+- **Hugging Face**: AI model integration
+- **React Community**: Framework and ecosystem
+- **PDF.js**: PDF processing capabilities
