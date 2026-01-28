@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabase";
 class ChatService {
   constructor() {
     this.apiKey = process.env.REACT_APP_HF_API_KEY;
-    this.apiUrls = ["https://router.huggingface.co/v1/chat/completions"];
+    this.apiUrls = ["https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions"];
     this.currentUrlIndex = 0;
 
     // Enhanced debugging for API key
@@ -49,7 +49,7 @@ class ChatService {
         .select("extracted_text, status")
         .eq("file_id", fileId)
         .eq("status", "completed")
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching extracted text:", error);
@@ -93,7 +93,7 @@ class ChatService {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: "meta-llama/Llama-3.1-8B-Instruct:fireworks-ai",
+              model: "meta-llama/Meta-Llama-3-8B-Instruct",
               messages: [
                 { role: "user", content: prompt }, // prompt = context + question
               ],
@@ -118,16 +118,14 @@ class ChatService {
             };
           } else {
             console.log(
-              `❌ Model ${i + 1} failed: ${response.status} ${
-                response.statusText
+              `❌ Model ${i + 1} failed: ${response.status} ${response.statusText
               }`
             );
             if (i === this.apiUrls.length - 1) {
               // Last model failed, throw error
               const errorData = await response.json();
               throw new Error(
-                `API request failed: ${response.status} - ${
-                  errorData.error || "Unknown error"
+                `API request failed: ${response.status} - ${errorData.error || "Unknown error"
                 }`
               );
             }
@@ -242,7 +240,7 @@ Answer based on the context above:`;
         .select("status")
         .eq("file_id", fileId)
         .eq("status", "completed")
-        .single();
+        .maybeSingle();
 
       return !error && data;
     } catch (error) {

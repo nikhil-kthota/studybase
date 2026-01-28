@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 class QuizGenerationService {
   constructor() {
     this.apiKey = process.env.REACT_APP_HF_API_KEY;
-    this.apiUrl = "https://router.huggingface.co/v1/chat/completions";
+    this.apiUrl = "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions";
 
     // Enhanced debugging for API key
     console.log("Quiz Generation Service - Environment check:");
@@ -32,7 +32,7 @@ class QuizGenerationService {
   async generateQuiz(fileIds, quizConfig) {
     try {
       console.log('Starting quiz generation with config:', quizConfig);
-      
+
       // Extract text content from all selected files
       const context = await this.extractTextFromFiles(fileIds);
       if (!context || context.trim().length === 0) {
@@ -44,7 +44,7 @@ class QuizGenerationService {
 
       // Create structured prompt for LLM
       const prompt = this.createQuizPrompt(context, quizConfig);
-      
+
       // Call Hugging Face API
       const llmResponse = await this.callLLM(prompt);
       if (!llmResponse.success) {
@@ -64,7 +64,7 @@ class QuizGenerationService {
       }
 
       console.log(`Successfully generated ${questions.length} questions`);
-      
+
       return {
         success: true,
         questions: questions
@@ -135,10 +135,10 @@ class QuizGenerationService {
    */
   createQuizPrompt(context, config) {
     const { difficulty, totalMcqs, totalSaqs, totalLaqs } = config;
-    
+
     // Truncate context if too long (to stay within API limits)
     const maxContextLength = 3000;
-    const truncatedContext = context.length > maxContextLength 
+    const truncatedContext = context.length > maxContextLength
       ? context.substring(0, maxContextLength) + "..."
       : context;
 
@@ -203,7 +203,7 @@ Generate the questions now:`;
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "meta-llama/Llama-3.1-8B-Instruct:fireworks-ai",
+          model: "meta-llama/Meta-Llama-3-8B-Instruct",
           messages: [
             { role: "user", content: prompt }
           ],
@@ -249,10 +249,10 @@ Generate the questions now:`;
     try {
       console.log('Parsing LLM response...');
       console.log('Expected questions:', config.totalMcqs + config.totalSaqs + config.totalLaqs);
-      
+
       const questions = [];
       const lines = llmResponse.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-      
+
       let currentQuestion = null;
       let questionNumber = 1;
       let mcqCount = 0;
@@ -261,7 +261,7 @@ Generate the questions now:`;
 
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        
+
         // Detect question type
         if (line.startsWith('MCQ:') && mcqCount < config.totalMcqs) {
           if (currentQuestion) {
@@ -348,23 +348,23 @@ Generate the questions now:`;
 
       console.log(`Parsed ${questions.length} questions from LLM response`);
       console.log(`MCQ: ${mcqCount}/${config.totalMcqs}, SAQ: ${saqCount}/${config.totalSaqs}, LAQ: ${laqCount}/${config.totalLaqs}`);
-      
+
       // Validate questions
-      const validQuestions = questions.filter(q => 
-        q.questionText && 
-        q.correctAnswer && 
+      const validQuestions = questions.filter(q =>
+        q.questionText &&
+        q.correctAnswer &&
         q.explanation &&
         (q.type !== 'mcq' || Object.keys(q.options).length === 4)
       );
 
       console.log(`Valid questions: ${validQuestions.length}`);
-      
+
       // Check if we have the expected number of questions
       const expectedTotal = config.totalMcqs + config.totalSaqs + config.totalLaqs;
       if (validQuestions.length !== expectedTotal) {
         console.warn(`Warning: Expected ${expectedTotal} questions but got ${validQuestions.length}`);
       }
-      
+
       return validQuestions;
 
     } catch (error) {
@@ -380,36 +380,36 @@ Generate the questions now:`;
    */
   validateQuizConfig(config) {
     const { quizName, difficulty, totalMcqs, totalSaqs, totalLaqs } = config;
-    
+
     if (!quizName || quizName.trim().length === 0) {
       return { valid: false, error: 'Quiz name is required' };
     }
-    
+
     if (!difficulty || !['easy', 'medium', 'hard'].includes(difficulty)) {
       return { valid: false, error: 'Please select a valid difficulty level' };
     }
-    
+
     if (!totalMcqs || totalMcqs < 0 || totalMcqs > 20) {
       return { valid: false, error: 'MCQ count must be between 0 and 20' };
     }
-    
+
     if (!totalSaqs || totalSaqs < 0 || totalSaqs > 20) {
       return { valid: false, error: 'SAQ count must be between 0 and 20' };
     }
-    
+
     if (!totalLaqs || totalLaqs < 0 || totalLaqs > 20) {
       return { valid: false, error: 'LAQ count must be between 0 and 20' };
     }
-    
+
     const totalQuestions = totalMcqs + totalSaqs + totalLaqs;
     if (totalQuestions === 0) {
       return { valid: false, error: 'At least one question type must be selected' };
     }
-    
+
     if (totalQuestions > 30) {
       return { valid: false, error: 'Total questions cannot exceed 30' };
     }
-    
+
     return { valid: true };
   }
 }

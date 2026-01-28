@@ -22,7 +22,7 @@ class PDFTextExtractor {
   async extractAndStoreText(fileId, filePath, fileName) {
     try {
       console.log(`Starting text extraction for file: ${fileName}`);
-      
+
       // Check if text is already extracted
       const existingText = await this.getExistingText(fileId);
       if (existingText) {
@@ -50,7 +50,7 @@ class PDFTextExtractor {
       await this.storeExtractedText(fileId, extractedText, fileName);
 
       console.log(`Successfully extracted and stored text for file: ${fileName}`);
-      
+
       return {
         success: true,
         text: extractedText,
@@ -59,10 +59,10 @@ class PDFTextExtractor {
 
     } catch (error) {
       console.error(`Error extracting text from ${fileName}:`, error);
-      
+
       // Store error information
       await this.storeExtractionError(fileId, error.message);
-      
+
       return {
         success: false,
         error: error.message,
@@ -106,20 +106,20 @@ class PDFTextExtractor {
     try {
       // Dynamically import PDF.js
       const pdfjsLib = await import('pdfjs-dist');
-      
+
       // Use a reliable CDN for the worker
       pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
-      
+
       console.log('PDF.js worker configured:', pdfjsLib.GlobalWorkerOptions.workerSrc);
 
       // Load PDF document with basic settings
-      const pdf = await pdfjsLib.getDocument({ 
+      const pdf = await pdfjsLib.getDocument({
         data: pdfBuffer,
         useWorkerFetch: false,
         isEvalSupported: false,
         useSystemFonts: true
       }).promise;
-      
+
       let fullText = '';
       const totalPages = pdf.numPages;
 
@@ -128,7 +128,7 @@ class PDFTextExtractor {
         try {
           const page = await pdf.getPage(pageNum);
           const textContent = await page.getTextContent();
-          
+
           // Combine text items from the page
           const pageText = textContent.items
             .map(item => item.str)
@@ -137,7 +137,7 @@ class PDFTextExtractor {
             .trim();
 
           fullText += pageText + '\n\n';
-          
+
           // Add progress logging for large PDFs
           if (totalPages > 10 && pageNum % 10 === 0) {
             console.log(`Processed ${pageNum}/${totalPages} pages`);
@@ -150,14 +150,14 @@ class PDFTextExtractor {
 
       // Clean up the extracted text
       const cleanedText = this.cleanExtractedText(fullText);
-      
+
       console.log(`Extracted text from ${totalPages} pages, ${cleanedText.length} characters`);
-      
+
       return cleanedText;
 
     } catch (error) {
       console.error('Error extracting text from PDF:', error);
-      
+
       // Try fallback method if PDF.js fails
       console.log('Attempting fallback text extraction method...');
       try {
@@ -178,18 +178,18 @@ class PDFTextExtractor {
     try {
       // Convert ArrayBuffer to Uint8Array for processing
       const uint8Array = new Uint8Array(pdfBuffer);
-      
+
       // Simple text extraction using regex patterns
       // This is a basic fallback - not as accurate as PDF.js but works for simple PDFs
       const textContent = this.extractTextFromPDFBytes(uint8Array);
-      
+
       if (!textContent || textContent.trim().length === 0) {
         throw new Error('No text content found in PDF using fallback method');
       }
-      
+
       console.log('Fallback extraction successful:', textContent.length, 'characters');
       return this.cleanExtractedText(textContent);
-      
+
     } catch (error) {
       console.error('Fallback extraction failed:', error);
       throw error;
@@ -205,16 +205,16 @@ class PDFTextExtractor {
     try {
       // Convert bytes to string for text extraction
       const text = new TextDecoder('utf-8', { ignoreBOM: true }).decode(bytes);
-      
+
       // Extract text between BT (Begin Text) and ET (End Text) markers
       const textMatches = text.match(/BT[\s\S]*?ET/g);
-      
+
       if (!textMatches) {
         return '';
       }
-      
+
       let extractedText = '';
-      
+
       for (const match of textMatches) {
         // Extract text content from PDF text objects
         const textContent = match.match(/\((.*?)\)/g);
@@ -226,9 +226,9 @@ class PDFTextExtractor {
           }
         }
       }
-      
+
       return extractedText;
-      
+
     } catch (error) {
       console.error('Error in basic PDF text extraction:', error);
       return '';
@@ -271,7 +271,7 @@ class PDFTextExtractor {
           bases!inner(user_id)
         `)
         .eq('id', fileId)
-        .single();
+        .maybeSingle();
 
       if (fileError || !fileData) {
         throw new Error(`File not found or access denied: ${fileError?.message || 'Unknown error'}`);
@@ -290,13 +290,13 @@ class PDFTextExtractor {
 
       if (error) {
         console.error('Error storing extracted text:', error);
-        
+
         // If RLS policy fails, try alternative approach
         if (error.code === '42501') {
           console.log('RLS policy error detected, trying alternative storage method...');
           return await this.storeExtractedTextAlternative(fileId, text, fileName);
         }
-        
+
         throw new Error(`Database error: ${error.message}`);
       }
 
@@ -370,7 +370,7 @@ class PDFTextExtractor {
         .from('pdf_text_content')
         .select('extracted_text, status')
         .eq('file_id', fileId)
-        .single();
+        .maybeSingle();
 
       if (error || !data) {
         return null;
@@ -485,7 +485,7 @@ class PDFTextExtractor {
         .from('pdf_text_content')
         .select('*')
         .eq('file_id', fileId)
-        .single();
+        .maybeSingle();
 
       if (error || !data) {
         return {
@@ -499,11 +499,11 @@ class PDFTextExtractor {
         textLength: data.text_length,
         extractionDate: data.extraction_date,
         errorMessage: data.error_message,
-        message: data.status === 'completed' 
+        message: data.status === 'completed'
           ? `Text extracted successfully (${data.text_length} characters)`
           : data.status === 'failed'
-          ? `Extraction failed: ${data.error_message}`
-          : 'Processing status unknown'
+            ? `Extraction failed: ${data.error_message}`
+            : 'Processing status unknown'
       };
 
     } catch (error) {
