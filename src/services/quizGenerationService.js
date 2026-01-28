@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 class QuizGenerationService {
   constructor() {
     this.apiKey = process.env.REACT_APP_HF_API_KEY;
-    this.apiUrl = "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct";
+    this.apiUrl = "/api/hf";
 
     // Enhanced debugging for API key
     console.log("Quiz Generation Service - Environment check:");
@@ -200,7 +200,6 @@ Generate the questions now:`;
       const response = await fetch(this.apiUrl, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

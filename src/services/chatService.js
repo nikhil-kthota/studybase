@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabase";
 class ChatService {
   constructor() {
     this.apiKey = process.env.REACT_APP_HF_API_KEY;
-    this.apiUrls = ["https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct"];
+    this.apiUrls = ["/api/hf"];
     this.currentUrlIndex = 0;
 
     // Enhanced debugging for API key
@@ -91,7 +91,6 @@ class ChatService {
           const response = await fetch(apiUrl, {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${this.apiKey}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
