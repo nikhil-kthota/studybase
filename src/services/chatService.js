@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabase";
 class ChatService {
   constructor() {
     this.apiKey = process.env.REACT_APP_HF_API_KEY;
-    this.apiUrls = ["https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions"];
+    this.apiUrls = ["https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct"];
     this.currentUrlIndex = 0;
 
     // Enhanced debugging for API key
@@ -78,7 +78,9 @@ class ChatService {
       }
 
       // Create a comprehensive prompt that includes the context and question
-      const prompt = this.createPrompt(question, context);
+      // Using Llama 3 prompt format
+      const rawPrompt = this.createPrompt(question, context);
+      const prompt = `<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n${rawPrompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n`;
 
       // Try each model until one works
       for (let i = 0; i < this.apiUrls.length; i++) {
@@ -93,11 +95,12 @@ class ChatService {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: "meta-llama/Meta-Llama-3-8B-Instruct",
-              messages: [
-                { role: "user", content: prompt }, // prompt = context + question
-              ],
-              stream: false,
+              inputs: prompt,
+              parameters: {
+                max_new_tokens: 1000,
+                return_full_text: false,
+                temperature: 0.7
+              }
             }),
           });
 
@@ -109,8 +112,17 @@ class ChatService {
               throw new Error(`API error: ${data.error}`);
             }
 
-            // Extract the generated text from the response
-            const generatedText = data.choices[0].message.content;
+            // Extract the generated text from the standard HF Inference API response (array)
+            // Llama 3 endpoint usually returns [{ generated_text: "..." }]
+            let generatedText = "";
+            if (Array.isArray(data) && data.length > 0) {
+              generatedText = data[0].generated_text;
+            } else if (data.generated_text) {
+              generatedText = data.generated_text;
+            } else {
+              // Fallback if structure is unexpected
+              generatedText = JSON.stringify(data);
+            }
 
             return {
               success: true,
@@ -123,9 +135,9 @@ class ChatService {
             );
             if (i === this.apiUrls.length - 1) {
               // Last model failed, throw error
-              const errorData = await response.json();
+              const errorData = await response.json().catch(() => ({}));
               throw new Error(
-                `API request failed: ${response.status} - ${errorData.error || "Unknown error"
+                `API request failed: ${response.status} - ${errorData.error || response.statusText
                 }`
               );
             }

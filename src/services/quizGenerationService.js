@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 class QuizGenerationService {
   constructor() {
     this.apiKey = process.env.REACT_APP_HF_API_KEY;
-    this.apiUrl = "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions";
+    this.apiUrl = "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct";
 
     // Enhanced debugging for API key
     console.log("Quiz Generation Service - Environment check:");
@@ -43,7 +43,8 @@ class QuizGenerationService {
       }
 
       // Create structured prompt for LLM
-      const prompt = this.createQuizPrompt(context, quizConfig);
+      const rawPrompt = this.createQuizPrompt(context, quizConfig);
+      const prompt = `<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n${rawPrompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n`;
 
       // Call Hugging Face API
       const llmResponse = await this.callLLM(prompt);
@@ -150,7 +151,7 @@ ${truncatedContext}
 REQUIREMENTS:
 - Difficulty Level: ${difficulty}
 - Generate exactly ${totalMcqs} Multiple Choice Questions (MCQs)
-- Generate exactly ${totalSaqs} Short Answer Questions (SAQs)  
+- Generate exactly ${totalSaqs} Short Answer Questions (SAQs)
 - Generate exactly ${totalLaqs} Long Answer Questions (LAQs)
 
 FORMAT REQUIREMENTS:
@@ -203,11 +204,12 @@ Generate the questions now:`;
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "meta-llama/Meta-Llama-3-8B-Instruct",
-          messages: [
-            { role: "user", content: prompt }
-          ],
-          stream: false,
+          inputs: prompt,
+          parameters: {
+            max_new_tokens: 1500,
+            return_full_text: false,
+            temperature: 0.7
+          }
         }),
       });
 
@@ -219,15 +221,24 @@ Generate the questions now:`;
           throw new Error(`API error: ${data.error}`);
         }
 
-        const generatedText = data.choices[0].message.content;
+        // Llama 3 Inference API returns array of objects
+        let generatedText = "";
+        if (Array.isArray(data) && data.length > 0) {
+          generatedText = data[0].generated_text;
+        } else if (data.generated_text) {
+          generatedText = data.generated_text;
+        } else {
+          generatedText = JSON.stringify(data);
+        }
+
         return {
           success: true,
           response: generatedText
         };
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(
-          `API request failed: ${response.status} - ${errorData.error || "Unknown error"}`
+          `API request failed: ${response.status} - ${errorData.error || response.statusText}`
         );
       }
     } catch (error) {
