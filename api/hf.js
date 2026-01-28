@@ -25,7 +25,7 @@ export default async function handler(request, response) {
 
     try {
         const apiResponse = await fetch(
-            'https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct',
+            'https://router.huggingface.co/hf-inference/models/meta-llama/Meta-Llama-3-8B-Instruct',
             {
                 method: 'POST',
                 headers: {

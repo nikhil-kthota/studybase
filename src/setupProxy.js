@@ -5,10 +5,10 @@ module.exports = function (app) {
     app.use(
         '/api/hf',
         createProxyMiddleware({
-            target: 'https://api-inference.huggingface.co',
+            target: 'https://router.huggingface.co',
             changeOrigin: true,
             pathRewrite: {
-                '^/api/hf': '/models/meta-llama/Meta-Llama-3-8B-Instruct',
+                '^/api/hf': '/hf-inference/models/meta-llama/Meta-Llama-3-8B-Instruct',
             },
             onProxyReq: (proxyReq, req, res) => {
                 // Add Authorization header with API key from environment
